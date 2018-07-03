@@ -13,7 +13,13 @@ int start_race = false;
 int countdown_done = true;
 int btn_state = 0;
 
+// mic
+const int sampleWindow = 50; // Sample window width in mS (50 mS = 20Hz)
+unsigned int sample;
+
 void setup() {
+  Serial.begin(9600);
+  
   // pinMode(BUZZER, OUTPUT);
   pinMode(GREEN, OUTPUT);
   pinMode(YELLOW, OUTPUT);
@@ -21,20 +27,25 @@ void setup() {
   // pinMode(START_BTN, INPUT);
   
   testrun();
-  digitalWrite(RED, HIGH);
+  //digitalWrite(RED, HIGH);
 }
 
 // 1 sec test of each light and buzzer
 void testrun() {
+  Serial.println("test run");
   digitalWrite(RED, HIGH);
   delay(1000);
   digitalWrite(RED, LOW);
-  digitalWrite(YELLOW, HIGH);
-  delay(1000);
-  digitalWrite(YELLOW, LOW);
-  digitalWrite(GREEN, HIGH);
-  delay(1000);
-  // digitalWrite(GREEN, LOW);
+  //digitalWrite(YELLOW, HIGH);
+  //delay(1000);
+  //digitalWrite(YELLOW, LOW);
+  //digitalWrite(GREEN, HIGH);
+  //delay(1000);
+  //digitalWrite(GREEN, LOW);
+  //digitalWrite(GREEN, HIGH);
+  
+  Serial.println("test run done");
+  
   // digitalWrite(BUZZER, HIGH);
   // delay(1000);
   // digitalWrite(BUZZER, LOW);
@@ -75,10 +86,38 @@ void stop_race() {
 void loop() {
   // btn_state = digitalRead(START_BTN);
   // if(btn_state == HIGH) {  // Protoshield pulled high by default
+  /*
    if (start_race) {
     stop_race();
    } else {
     go(); 
-   }
+   } */
   // }
+  unsigned long startMillis= millis();  // Start of sample window
+   unsigned int peakToPeak = 0;   // peak-to-peak level
+ 
+   unsigned int signalMax = 0;
+   unsigned int signalMin = 1024;
+ 
+   // collect data for 50 mS
+   while (millis() - startMillis < sampleWindow)
+   {
+      sample = analogRead(0);
+      if (sample < 1024)  // toss out spurious readings
+      {
+         if (sample > signalMax)
+         {
+            signalMax = sample;  // save just the max levels
+         }
+         else if (sample < signalMin)
+         {
+            signalMin = sample;  // save just the min levels
+         }
+      }
+   }
+   peakToPeak = signalMax - signalMin;  // max - min = peak-peak amplitude
+   double volts = (peakToPeak * 5.0) / 1024;  // convert to volts
+ 
+   Serial.println(volts);
+  
 }

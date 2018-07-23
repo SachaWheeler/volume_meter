@@ -7,19 +7,14 @@
 const int GREEN = 9;
 const int YELLOW = 6;
 const int RED = 3;
-//const int START_BTN = 13;
-
-int start_race = false;
-int countdown_done = true;
-int btn_state = 0;
 
 // mic
 const int sampleWindow = 500; // Sample window width in mS (50 mS = 20Hz)
 unsigned int sample;
 
 float green = 0.3;
-float yellow = 0.9;
-float red = 1.5;
+float yellow = 0.6;
+float red = 1.2;
 
 void setup() {
   Serial.begin(9600);
